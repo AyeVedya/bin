@@ -1,0 +1,444 @@
+#### PIG #############
+
+cat > /home/cloudera/input.csv
+cat  /home/cloudera/input.csv
+pig -x local
+lines = load '/home/cloudera/input.csv' as (line:chararray);
+words = foreach lines GENERATE FLATTEN(TOKENIZE(line)) as word;
+grouped = GROUP words by word;
+wordcount = foreach grouped GENERATE group, COUNT(words);
+dump wordcount;
+
+
+###########################################################################################
+
+#### HIVE ###########
+
+cat > /home/cloudera/employee.txt
+1~Sachine~Pune~Product Engineering~100000~Big Data
+2~Gaurav~Banglore~Sales~90000~CRM
+3~Manish~Chennai~Recruiter~125000~HR
+4~Bhushan~Hyderabad~Developer~50000~BFSI
+realpath employee.txt
+cat  /home/cloudera/employee.txt
+sudo -u hdfs hadoop fs -put /home/cloudera/employee.txt /inputdirectory
+hdfs dfs -ls /
+hdfs dfs -ls /inputdirectory
+hadoop fs -cat  /inputdirectory/employee.txt
+hive
+show databases;
+create database organization;
+show databases;
+use organization;
+show tables;
+hive> create table employee(
+    > id int,
+    > name string,
+    > city string,
+    > department string,
+    > salary int,
+    > domain string)
+    > row format delimited
+    > fields terminated by '~';
+
+show tables;
+select * from employee;
+show tables;
+load data inpath '/inputdirectory/employee.txt' overwrite into table employee;
+show tables;
+select * from employee;
+
+##########################################################################################
+
+# Simple Regression #
+
+# Simple Linear Regression
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# Importing the dataset
+dataset = pd.read_csv('Salary_Data.csv')
+X = dataset.iloc[:, :-1].values
+y = dataset.iloc[:, -1].values
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 1/3, random_state = 0)
+# Training the Simple Linear Regression model on the Training set
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X_train, y_train)
+# Predicting the Test set results
+y_pred = regressor.predict(X_test)
+# Visualising the Training set results
+plt.scatter(X_train, y_train, color = 'red')
+plt.plot(X_train, regressor.predict(X_train), color = 'blue')
+plt.title('Salary vs Experience (Training set)')
+plt.xlabel('Years of Experience')
+plt.ylabel('Salary')
+plt.show()
+# Visualising the Test set results
+plt.scatter(X_test, y_test, color = 'red')
+plt.plot(X_train, regressor.predict(X_train), color = 'blue')
+plt.title('Salary vs Experience (Test set)')
+plt.xlabel('Years of Experience')
+plt.ylabel('Salary')
+plt.show()
+
+
+###########################################################################################
+# Multiple Regression
+
+# Multiple Linear Regression
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# Importing the dataset
+dataset = pd.read_csv('50_Startups.csv')
+X = dataset.iloc[:, :-1].values
+y = dataset.iloc[:, -1].values
+print(X)
+# Encoding categorical data
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [3])], remainder='passthrough')
+X = np.array(ct.fit_transform(X))
+print(X)
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+# Training the Multiple Linear Regression model on the Training set
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X_train, y_train)
+# Predicting the Test set results
+y_pred = regressor.predict(X_test)
+np.set_printoptions(precision=2)
+print(np.concatenate((y_pred.reshape(len(y_pred),1), y_test.reshape(len(y_test),1)),1))
+
+# Plotting the predicted values versus actual values in the test set
+plt.scatter(range(len(y_test)), y_test, color='red', label='Actual Values')
+plt.scatter(range(len(y_test)), y_pred, color='blue', label='Predicted Values')
+plt.title('Multiple Linear Regression: Actual vs Predicted')
+plt.xlabel('Data Point Index')
+plt.ylabel('Values')
+plt.legend()
+plt.show()
+
+
+
+###########################################################################################
+# Hierarchical Clustering
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# Importing the dataset
+dataset = pd.read_csv('Mall_Customers.csv')
+X = dataset.iloc[:, [3, 4]].values
+# Using the dendrogram to find the optimal number of clusters
+import scipy.cluster.hierarchy as sch
+dendrogram = sch.dendrogram(sch.linkage(X, method = 'ward'))
+plt.title('Dendrogram')
+plt.xlabel('Customers')
+plt.ylabel('Euclidean distances')
+plt.show()
+# Training the Hierarchical Clustering model on the dataset
+from sklearn.cluster import AgglomerativeClustering
+hc = AgglomerativeClustering(n_clusters = 5, affinity = 'euclidean', linkage = 'ward')
+y_hc = hc.fit_predict(X)
+# Visualising the clusters
+plt.scatter(X[y_hc == 0, 0], X[y_hc == 0, 1], s = 100, c = 'red', label = 'Cluster 1')
+plt.scatter(X[y_hc == 1, 0], X[y_hc == 1, 1], s = 100, c = 'blue', label = 'Cluster 2')
+plt.scatter(X[y_hc == 2, 0], X[y_hc == 2, 1], s = 100, c = 'green', label = 'Cluster 3')
+plt.scatter(X[y_hc == 3, 0], X[y_hc == 3, 1], s = 100, c = 'cyan', label = 'Cluster 4')
+plt.scatter(X[y_hc == 4, 0], X[y_hc == 4, 1], s = 100, c = 'magenta', label = 'Cluster 5')
+plt.title('Clusters of customers')
+plt.xlabel('Annual Income (k$)')
+plt.ylabel('Spending Score (1-100)')
+plt.legend()
+plt.show()
+
+
+###########################################################################################
+#  K-Means Clustering
+
+# K-Means Clustering
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('/content/Mall_Customers.csv')
+X = dataset.iloc[:, [3, 4]].values
+
+# Using the elbow method to find the optimal number of clusters
+from sklearn.cluster import KMeans
+wcss = []
+
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_)
+
+# Plotting the elbow method results outside the loop
+plt.plot(range(1, 11), wcss)
+plt.title('The Elbow Method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS')
+plt.show()
+
+# Training the K-Means model on the dataset
+kmeans = KMeans(n_clusters=5, init='k-means++', random_state=42)
+y_kmeans = kmeans.fit_predict(X)
+
+# Visualising the clusters
+plt.scatter(X[y_kmeans == 0, 0], X[y_kmeans == 0, 1], s=100, c='red', label='Cluster 1')
+plt.scatter(X[y_kmeans == 1, 0], X[y_kmeans == 1, 1], s=100, c='blue', label='Cluster 2')
+plt.scatter(X[y_kmeans == 2, 0], X[y_kmeans == 2, 1], s=100, c='green', label='Cluster 3')
+plt.scatter(X[y_kmeans == 3, 0], X[y_kmeans == 3, 1], s=100, c='cyan', label='Cluster 4')
+plt.scatter(X[y_kmeans == 4, 0], X[y_kmeans == 4, 1], s=100, c='magenta', label='Cluster 5')
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='yellow', label='Centroids')
+plt.title('Clusters of customers')
+plt.xlabel('Annual Income (k$)')
+plt.ylabel('Spending Score (1-100)')
+plt.legend()
+plt.show()
+
+###########################################################################################
+# K-Nearest Neighbors (K-NN)
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+data = pd.read_csv('Social_Network_Ads.csv')
+data.head()
+
+X=data.iloc[:,2:4]
+X.shape
+
+y=data.iloc[:,-1].values
+y.shape
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2)
+
+X_train.shape
+
+X_test.shape
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_train
+
+X_test = scaler.fit_transform(X_test)
+X_test
+
+# 1st method of finding k
+np.sqrt(X_train.shape[0])
+k = 17
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors=k)
+knn.fit(X_train,y_train)
+y_pred = knn.predict(X_test)
+y_pred.shape
+y_test.shape
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test,y_pred)
+from sklearn.metrics import confusion_matrix
+confusion_matrix(y_test,y_pred)
+
+# 2nd method of k
+accuracy = []
+
+for i in range(1,26):
+    knn = KNeighborsClassifier(n_neighbors=i)
+    knn.fit(X_train,y_train)
+    accuracy.append(accuracy_score(y_test,knn.predict(X_test)))
+len(accuracy)
+plt.plot(range(1,26),accuracy)
+
+def predict_output():
+    age= int(input("Enter the age "))
+    salary= int(input("Enter the salary "))
+
+    X_new=np.array([[age],[salary]]).reshape(1,2)
+    X_new=scaler.transform(X_new)
+
+    if knn.predict(X_new)[0] == 0:
+        return "Will not purchase"
+    else:
+        return "Will purchase"
+
+
+###########################################################################################
+# Naive Bayes Algo
+
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('Social_Network_Ads.csv')
+
+# One-Hot Encoding for the 'Gender' column
+dataset = pd.get_dummies(dataset, columns=['Gender'], drop_first=True)
+
+# Extracting features and target variable
+X = dataset.iloc[:, [2, 3, 4]].values  # Selecting relevant columns (Age, EstimatedSalary, Gender_Male)
+y = dataset.iloc[:, -1].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+# Training the Naive Bayes model on the Training set
+from sklearn.naive_bayes import GaussianNB
+
+classifier = GaussianNB()
+classifier.fit(X_train, y_train)
+
+# Predicting the Test set results
+y_pred = classifier.predict(X_test)
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+cm = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(cm)
+
+acc_score = accuracy_score(y_test, y_pred)
+print("Accuracy Score:", acc_score)
+
+# Visualising the Training set results
+from matplotlib.colors import ListedColormap
+
+X_set, y_set = X_train, y_train
+X1, X2 = np.meshgrid(np.arange(start=X_set[:, 0].min() - 1, stop=X_set[:, 0].max() + 1, step=0.01),
+                     np.arange(start=X_set[:, 1].min() - 1, stop=X_set[:, 1].max() + 1, step=0.01))
+
+plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel(), np.zeros_like(X1.ravel())]).T).reshape(X1.shape),
+             alpha=0.75, cmap=ListedColormap(['red', 'green']))
+
+plt.xlim(X1.min(), X1.max())
+plt.ylim(X2.min(), X2.max())
+
+for i, j in enumerate(np.unique(y_set)):
+    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1], c=ListedColormap(['red', 'green'])(i), label=j)
+
+plt.title('Naive Bayes (Training set)')
+plt.xlabel('Age')
+plt.ylabel('Estimated Salary')
+plt.legend()
+plt.show()
+
+
+
+###########################################################################################
+# Support Vector Machine (SVM)
+# Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('/content/Social_Network_Ads.csv')
+dataset.head()
+
+X = dataset.iloc[:, [2, 3]].values
+y = dataset.iloc[:, 4].values
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
+
+print(X_train.shape)
+print(X_test.shape)
+print(y_train.shape)
+print(y_test.shape)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+# Fitting SVM to the Training set
+from sklearn.svm import SVC
+classifier = SVC(kernel = 'linear', random_state = 0)
+classifier.fit(X_train, y_train)
+
+# Predicting the Test set results
+y_pred = classifier.predict(X_test)
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+
+y_pred
+
+print(cm)
+
+#Accuracy score
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test, y_pred)
+
+#Classification Report
+from sklearn.metrics import classification_report
+print(classification_report(y_test, y_pred))
+
+# Visualising the Training set results
+from matplotlib.colors import ListedColormap
+X_set, y_set = X_train, y_train
+X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1, stop = X_set[:, 0].max() + 1, step = 0.01),
+                     np.arange(start = X_set[:, 1].min() - 1, stop = X_set[:, 1].max() + 1, step = 0.01))
+plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
+             alpha = 0.75, cmap = ListedColormap(('red', 'green')))
+plt.xlim(X1.min(), X1.max())
+plt.ylim(X2.min(), X2.max())
+for i, j in enumerate(np.unique(y_set)):
+    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
+                c = ListedColormap(('red', 'green'))(i), label = j)
+plt.title('SVM (Training set)')
+plt.xlabel('Age')
+plt.ylabel('Estimated Salary')
+plt.legend()
+plt.show()
+
+# Visualising the Test set results
+from matplotlib.colors import ListedColormap
+X_set, y_set = X_test, y_test
+X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1, stop = X_set[:, 0].max() + 1, step = 0.01),
+                     np.arange(start = X_set[:, 1].min() - 1, stop = X_set[:, 1].max() + 1, step = 0.01))
+plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
+             alpha = 0.75, cmap = ListedColormap(('red', 'green')))
+plt.xlim(X1.min(), X1.max())
+plt.ylim(X2.min(), X2.max())
+for i, j in enumerate(np.unique(y_set)):
+    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
+                c = ListedColormap(('red', 'green'))(i), label = j)
+plt.title('SVM (Test set)')
+plt.xlabel('Age')
+plt.ylabel('Estimated Salary')
+plt.legend()
+plt.show()
+
+
+
+
+
