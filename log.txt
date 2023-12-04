@@ -1,444 +1,455 @@
-#### PIG #############
-
-cat > /home/cloudera/input.csv
-cat  /home/cloudera/input.csv
-pig -x local
-lines = load '/home/cloudera/input.csv' as (line:chararray);
-words = foreach lines GENERATE FLATTEN(TOKENIZE(line)) as word;
-grouped = GROUP words by word;
-wordcount = foreach grouped GENERATE group, COUNT(words);
-dump wordcount;
+# Practical 1: Write a program which demonstrates the following:
+# a. Addition of two complex numbers
+# b. Displaying the conjugate of a complex number
+# c. Plotting a set of complex numbers
+# d. Creating a new plot by rotating the given number by a degree 90, 180, 270 degrees and
+# also by scaling by a number a=1/2, a=1/3, a=2 etc.
 
 
-###########################################################################################
-
-#### HIVE ###########
-
-cat > /home/cloudera/employee.txt
-1~Sachine~Pune~Product Engineering~100000~Big Data
-2~Gaurav~Banglore~Sales~90000~CRM
-3~Manish~Chennai~Recruiter~125000~HR
-4~Bhushan~Hyderabad~Developer~50000~BFSI
-realpath employee.txt
-cat  /home/cloudera/employee.txt
-sudo -u hdfs hadoop fs -put /home/cloudera/employee.txt /inputdirectory
-hdfs dfs -ls /
-hdfs dfs -ls /inputdirectory
-hadoop fs -cat  /inputdirectory/employee.txt
-hive
-show databases;
-create database organization;
-show databases;
-use organization;
-show tables;
-hive> create table employee(
-    > id int,
-    > name string,
-    > city string,
-    > department string,
-    > salary int,
-    > domain string)
-    > row format delimited
-    > fields terminated by '~';
-
-show tables;
-select * from employee;
-show tables;
-load data inpath '/inputdirectory/employee.txt' overwrite into table employee;
-show tables;
-select * from employee;
-
-##########################################################################################
-
-# Simple Regression #
-
-# Simple Linear Regression
-# Importing the libraries
-import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-# Importing the dataset
-dataset = pd.read_csv('Salary_Data.csv')
-X = dataset.iloc[:, :-1].values
-y = dataset.iloc[:, -1].values
-# Splitting the dataset into the Training set and Test set
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 1/3, random_state = 0)
-# Training the Simple Linear Regression model on the Training set
-from sklearn.linear_model import LinearRegression
-regressor = LinearRegression()
-regressor.fit(X_train, y_train)
-# Predicting the Test set results
-y_pred = regressor.predict(X_test)
-# Visualising the Training set results
-plt.scatter(X_train, y_train, color = 'red')
-plt.plot(X_train, regressor.predict(X_train), color = 'blue')
-plt.title('Salary vs Experience (Training set)')
-plt.xlabel('Years of Experience')
-plt.ylabel('Salary')
-plt.show()
-# Visualising the Test set results
-plt.scatter(X_test, y_test, color = 'red')
-plt.plot(X_train, regressor.predict(X_train), color = 'blue')
-plt.title('Salary vs Experience (Test set)')
-plt.xlabel('Years of Experience')
-plt.ylabel('Salary')
-plt.show()
 
+S = {3 + 3j, 4 + 3j, 2 + 1j, 2.5 + 1j, 3.25 + 1j}
 
-###########################################################################################
-# Multiple Regression
+print("Select Operation:")
+print("1: Addition of 2 complex numbers")
+print("2: Plot point from set of complex numbers")
+print("3: Translation")
+print("4: Rotation")
+print("5: Scaling")
+print("6: Exit")
 
-# Multiple Linear Regression
-# Importing the libraries
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-# Importing the dataset
-dataset = pd.read_csv('50_Startups.csv')
-X = dataset.iloc[:, :-1].values
-y = dataset.iloc[:, -1].values
-print(X)
-# Encoding categorical data
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [3])], remainder='passthrough')
-X = np.array(ct.fit_transform(X))
-print(X)
-# Splitting the dataset into the Training set and Test set
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
-# Training the Multiple Linear Regression model on the Training set
-from sklearn.linear_model import LinearRegression
-regressor = LinearRegression()
-regressor.fit(X_train, y_train)
-# Predicting the Test set results
-y_pred = regressor.predict(X_test)
-np.set_printoptions(precision=2)
-print(np.concatenate((y_pred.reshape(len(y_pred),1), y_test.reshape(len(y_test),1)),1))
+while True:
+    ch = int(input("Enter choice of Operation: "))
+    
+    if ch == 1:
+        c1 = complex(input("Enter Complex number c1: "))
+        c2 = complex(input("Enter Complex number c2: "))
+        print("Addition of 2 complex numbers:", c1 + c2)
+    
+    elif ch == 2:
+        S1 = {x for x in S}
+    
+    elif ch == 3:
+        c1 = complex(input("Enter translation in complex numbers: "))
+        S1 = {x + c1 for x in S}
+    
+    elif ch == 5:
+        scale = float(input("Enter Scale point like (.5) for 1/2: "))
+        S1 = {x * scale for x in S}
+    
+    elif ch == 4:
+        angle = int(input("Enter Angle of Rotation: "))
+        
+        if angle == 90:
+            S1 = {x * 1j for x in S}
+        elif angle == 180:
+            S1 = {x * (-1) for x in S}
+        elif angle == 270:
+            S1 = {x * 1j * (-1) for x in S}
+        else:
+            print("Invalid Angle entered")
+    
+    elif ch == 6:
+        break
 
-# Plotting the predicted values versus actual values in the test set
-plt.scatter(range(len(y_test)), y_test, color='red', label='Actual Values')
-plt.scatter(range(len(y_test)), y_pred, color='blue', label='Predicted Values')
-plt.title('Multiple Linear Regression: Actual vs Predicted')
-plt.xlabel('Data Point Index')
-plt.ylabel('Values')
-plt.legend()
+X = [x.real for x in S1]
+Y = [x.imag for x in S1]
+
+plt.plot(X, Y, 'ro')
+plt.axis([-6, 6, -6, 6])
 plt.show()
 
 
+# Practical 2: Write a program to do the following:
+# a. Enter two distinct faces as vectors u and v.
+# b. Find a new face as a linear combination of u and v i.e. au+bv for a and b
+# c. Find the average face of the original faces.
 
-###########################################################################################
-# Hierarchical Clustering
-# Importing the libraries
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-# Importing the dataset
-dataset = pd.read_csv('Mall_Customers.csv')
-X = dataset.iloc[:, [3, 4]].values
-# Using the dendrogram to find the optimal number of clusters
-import scipy.cluster.hierarchy as sch
-dendrogram = sch.dendrogram(sch.linkage(X, method = 'ward'))
-plt.title('Dendrogram')
-plt.xlabel('Customers')
-plt.ylabel('Euclidean distances')
-plt.show()
-# Training the Hierarchical Clustering model on the dataset
-from sklearn.cluster import AgglomerativeClustering
-hc = AgglomerativeClustering(n_clusters = 5, affinity = 'euclidean', linkage = 'ward')
-y_hc = hc.fit_predict(X)
-# Visualising the clusters
-plt.scatter(X[y_hc == 0, 0], X[y_hc == 0, 1], s = 100, c = 'red', label = 'Cluster 1')
-plt.scatter(X[y_hc == 1, 0], X[y_hc == 1, 1], s = 100, c = 'blue', label = 'Cluster 2')
-plt.scatter(X[y_hc == 2, 0], X[y_hc == 2, 1], s = 100, c = 'green', label = 'Cluster 3')
-plt.scatter(X[y_hc == 3, 0], X[y_hc == 3, 1], s = 100, c = 'cyan', label = 'Cluster 4')
-plt.scatter(X[y_hc == 4, 0], X[y_hc == 4, 1], s = 100, c = 'magenta', label = 'Cluster 5')
-plt.title('Clusters of customers')
-plt.xlabel('Annual Income (k$)')
-plt.ylabel('Spending Score (1-100)')
-plt.legend()
-plt.show()
+def scalMul(x, p):
+    return [x[i] * p for i in range(len(x))]
+
+def linCom(vlist, clist):
+    s = [scalMul(vlist[i], clist[i]) for i in range(len(vlist))]
+    l = []
+    for j in range(len(s[0])):
+        su = 0
+        for i in range(len(s)):
+            su = su + s[i][j]
+        l.append(su)
+    return l  # Fix: Corrected the return statement
+
+l = int(input("Enter the length of vector: "))
+u = []
+v = []
+c = []
+
+print("Enter the elements of vector u:")
+for i in range(l):
+    n = int(input("Enter number: "))
+    u.append(n)
+
+print("Enter the elements of vector v:")
+for i in range(l):
+    n = int(input("Enter number: "))
+    v.append(n)
+
+print("Enter the elements of coefficient:")
+c1 = int(input("Enter the coefficient of c1: "))
+c2 = int(input("Enter the coefficient of c2: "))
+
+newFace = [c1 * u[i] + c2 * v[i] for i in range(len(u))]
+print("New Face of u and v:", newFace)
+
+avgFace = [(u[i] + v[i]) / 2 for i in range(len(u))]
+print("Average Face of u and v is:", avgFace)
 
 
-###########################################################################################
-#  K-Means Clustering
+# Practical 3: Write a program to do the following:
+# a. Enter a vector u as a n-list
+# b. Enter another vector v as a n-list
+# c. Find the vector au+bv for different values of a and b
+# d. Find the dot product of u and v
 
-# K-Means Clustering
-# Importing the libraries
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+def scalarMul(x,p,y,q):
+    return sum([(x[i]*p)+(y[i]*q) 
+        for i in range (len(x))]) 
+def dotMul(x,y):
+    return sum([x[i]*y[i] for i in range (len(x))]) 
+v=[]
+u=[]
+n=int(input("Enter the no. of Elements you want to enter in vector: ")) 
+print("Enter Elements of vector u: ")
+for i in range(n): 
+    e=int(input("Enter elements: ")) 
+    u.append(e)
+print("Vector u = ",u)
+print("Enter Elements of vector v: ") 
+for i in range(n):
+    e=int(input("Enter elements: ")) 
+    v.append(e)
+print("Vector v = ",v) 
+while True:
+    print("Select Vector Operation: ") 
+    print("1: Scalar Multiplication")
+    print("2 : Dot Product")
+    print("3: Exit")
+    ch=int(input("Enter your Choice: ")) 
+    if ch==1:
+        print("To perform Scalar Multiplication") 
+        a=int(input("Enter the value of a: ")) 
+        b=int(input("Enter the value of b: ")) 
+        print("Sclar Multiplication =",scalarMul(u,a,v,b))
+    elif ch==2:
+        print("Dot Product of two matrix is: ",dotMul(u,v)) 
+    elif ch==3:
+        print("Program Terminated Successfully") 
+    break
 
-# Importing the dataset
-dataset = pd.read_csv('/content/Mall_Customers.csv')
-X = dataset.iloc[:, [3, 4]].values
 
-# Using the elbow method to find the optimal number of clusters
-from sklearn.cluster import KMeans
-wcss = []
+# Practical 4: Write a program to do the following:
+# a. Enter an r by c matrix M (r and c being positive integers)
+# b. Display M in matrix format
+# c. Display the rows and columns of the matrix M
+# d. Find the scalar multiplication of M for a given scalar.
+# e. Find the transpose of the matrix M
 
-for i in range(1, 11):
-    kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
-    kmeans.fit(X)
-    wcss.append(kmeans.inertia_)
 
-# Plotting the elbow method results outside the loop
-plt.plot(range(1, 11), wcss)
-plt.title('The Elbow Method')
-plt.xlabel('Number of clusters')
-plt.ylabel('WCSS')
-plt.show()
+global r,c
+def printmatrix(A):
+    print('the entered matrix M is') 
+    for i in range(r):
+        print(A[i])
+def printrows(A):
+    print('Rows of matrix') 
+    for i in range (r):
+        print('Row%d='%i,A[i])
+def printcolumns(A):
+    print('columns of matrix') 
+    for j in range(c):
+        print('column%d='%j,end="")
+    for i in range(r):
+        print(A[i][j],end="") 
+        print('\n')
+#Scalar Multiplication 
+def scalarmul(A,s):
+    N=[[s*A[i][j]
+        for j in range(c)] 
+            for i in range(r)] 
+    print('The scalar multiplication s*M=') 
+    printmatrix(N)
+#tranpose of matrix M 
+def transpose(A):
+    T=[[A[i][j] for i in range(r)] for j in range(c)] 
+    print('Transpose of M.T=')
+    for j in range(c): 
+        print(T[j])
+#Enter rXc Matrix M
+print ('enter the dimensions of matrix ') 
+r=int(input('enter no of rows: ')) 
+c=int(input('enter no of columns: '))
+M=[]
+for i in range (r):
+    print('enter elements of row',i) 
+    M.append([])
+    for j in range(c): 
+        n=int(input('enter no')) 
+        M[i].append(n)
+print('Select operation') 
+print('1:Display Matrix') 
+print('2:Display rows of matrix') 
+print('3:Display columns of matrix')
+print('4:Scalar Multiplication of matrix') 
+print('5:Transpose of matrix')
+print('6:Exit')
+while True:
+    ch=int(input('Enter choice for Operation')) 
+    if ch==1:
+        printmatrix(M) 
+    elif ch==2:
+        printrows(M) 
+    elif ch==3:
+        printcolumns(M) 
+    elif ch==4:
+        sc=int(input('enter scalar value')) 
+        scalarmul(M,sc)
+    elif ch==5:
+        transpose(M)
+    elif ch==6:
+        break
 
-# Training the K-Means model on the dataset
-kmeans = KMeans(n_clusters=5, init='k-means++', random_state=42)
-y_kmeans = kmeans.fit_predict(X)
 
-# Visualising the clusters
-plt.scatter(X[y_kmeans == 0, 0], X[y_kmeans == 0, 1], s=100, c='red', label='Cluster 1')
-plt.scatter(X[y_kmeans == 1, 0], X[y_kmeans == 1, 1], s=100, c='blue', label='Cluster 2')
-plt.scatter(X[y_kmeans == 2, 0], X[y_kmeans == 2, 1], s=100, c='green', label='Cluster 3')
-plt.scatter(X[y_kmeans == 3, 0], X[y_kmeans == 3, 1], s=100, c='cyan', label='Cluster 4')
-plt.scatter(X[y_kmeans == 4, 0], X[y_kmeans == 4, 1], s=100, c='magenta', label='Cluster 5')
-plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='yellow', label='Centroids')
-plt.title('Clusters of customers')
-plt.xlabel('Annual Income (k$)')
-plt.ylabel('Spending Score (1-100)')
-plt.legend()
-plt.show()
 
-###########################################################################################
-# K-Nearest Neighbors (K-NN)
-# Importing the libraries
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+# Practical 5: Write a program to do the following:
+# a. Find the vector –matrix multiplication of a r by c matrix M with an c-vector u.
+# b. Find the matrix-matrix product of M with a c by p matrix N
 
-data = pd.read_csv('Social_Network_Ads.csv')
-data.head()
-
-X=data.iloc[:,2:4]
-X.shape
-
-y=data.iloc[:,-1].values
-y.shape
-
-from sklearn.model_selection import train_test_split
-X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2)
-
-X_train.shape
-
-X_test.shape
-
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-
-X_train = scaler.fit_transform(X_train)
-X_train
-
-X_test = scaler.fit_transform(X_test)
-X_test
-
-# 1st method of finding k
-np.sqrt(X_train.shape[0])
-k = 17
-from sklearn.neighbors import KNeighborsClassifier
-knn = KNeighborsClassifier(n_neighbors=k)
-knn.fit(X_train,y_train)
-y_pred = knn.predict(X_test)
-y_pred.shape
-y_test.shape
-from sklearn.metrics import accuracy_score
-accuracy_score(y_test,y_pred)
-from sklearn.metrics import confusion_matrix
-confusion_matrix(y_test,y_pred)
-
-# 2nd method of k
-accuracy = []
-
-for i in range(1,26):
-    knn = KNeighborsClassifier(n_neighbors=i)
-    knn.fit(X_train,y_train)
-    accuracy.append(accuracy_score(y_test,knn.predict(X_test)))
-len(accuracy)
-plt.plot(range(1,26),accuracy)
-
-def predict_output():
-    age= int(input("Enter the age "))
-    salary= int(input("Enter the salary "))
-
-    X_new=np.array([[age],[salary]]).reshape(1,2)
-    X_new=scaler.transform(X_new)
-
-    if knn.predict(X_new)[0] == 0:
-        return "Will not purchase"
+import numpy as np 
+def vecMatrixMult():
+    r =int(input("Enter length of vector and number of rows in matrix:"))
+    c =int(input("Enter number of columns in matrix:"))
+    v=[]
+    M=[]
+    print("Enter Vectors") 
+    for i in range(r):
+        n=int(input("Enter number:")) 
+        v.append(n)
+    print("Enter Matrix")
+    for i in range(r):
+        print("Enter Elements of Rows: ",i+1) 
+        M.append([])
+        for j in range(c): 
+            n=int(input("Enter Number: ")) 
+            M[i].append(n)
+    print("\nResult of Vector-Matrix multiplication is",np.dot(v,M)) 
+def matrixmult():
+    M=[]
+    N=[]
+    r1 =int(input("Enter number of rows in matrix1:"))
+    c1 =int(input("Enter number of columns in matrix1:")) 
+    print("Enter Matrix1")
+    for i in range(r1):
+        print("Enter Elements of Rows: ",i+1) 
+        M.append([])
+    for j in range(c1): 
+        n=int(input("Enter Number: ")) 
+        M[i].append(n)
+    r2 =int(input("Enter number of rows in matrix2:"))
+    c2 =int(input("Enter number of columns in matrix2:")) 
+    print("Enter Matrix2")
+    for i in range(r2):
+        print("Enter Elements of Rows: ",i+1) 
+        N.append([])
+    for j in range(c2): 
+        n=int(input("Enter Number: ")) 
+        N[i].append(n)
+    if(c1 == r2): 
+        Mult=np.dot(M,N)
+        print("\nResult of Matrix multiplication is") 
+    for i in Mult:
+        print(i)
+while True:
+    print("Select Operations")
+    print("1. Vector-Matrix Multiplication") 
+    print("2. Matrix Multiplication") 
+    print("3. Exit")
+    ch=int(input("Enter your choice: "))    
+    if ch==1:
+        vecMatrixMult()
+    elif ch==2: 
+        matrixmult()
     else:
-        return "Will purchase"
+        break
 
 
-###########################################################################################
-# Naive Bayes Algo
+# Practical 6: Write a program to enter a matrix and 
+# check if it is invertible. If the inverse exists, find the inverse
 
-# Importing the libraries
+import numpy as np 
+def printMatrix(A):
+    print("\nMatrix")
+    for i in range(len(A)): 
+        print(A[i])
+c=int(input("Enter the Number of rows and cols of Square Matrix: ")) 
+r=c
+M=[]
+for i in range(r):
+    print("Enter Elements of Rows: ",i) 
+    M.append([])
+    for j in range(c): 
+        n=int(input("Enter Number: ")) 
+        M[i].append(n)
+printMatrix(M) 
+a=np.linalg.det(M)
+print("Determinant of matrix M is",a) 
+if a<=0:
+    Minv = np.linalg.inv(M)
+    print("The Inverse of matrix m is\n",Minv) 
+else:
+    print("Matrix is not invertible")
+
+
+# Practical 7: Write a program to convert a matrix into its 
+# row echelon form
+
+def row_echelon(m):
+    if not m: 
+        return 
+    lead= 0
+    rowCount = len(m) 
+    colCount =len(m[0])
+    for r in range(rowCount): 
+        if lead>= colCount:
+            return 
+        i = r
+        while m[i][lead] == 0: 
+            i+=1
+            if i == rowCount:
+                i = r
+                lead +=1
+                if colCount == lead: 
+                    return
+        m[i],m[r] = m[r],m[i] 
+        lv = m[r][lead]
+        m[r] = [mrx/float(lv) for mrx in m[r]] 
+        for i in range(rowCount):
+            if i != r:
+                lv=m[i][lead]
+                m[i] = [iv - lv*rv for rv,iv in zip(m[r],m[i])] 
+        lead+=1
+print("Enter dimensions of matrix: ") 
+r=int(input("Enter the no of rows: ")) 
+c=int(input("Enter the no of cols: ")) 
+mtr=[]
+for i in range (r): 
+    mtr.append([])
+    print("Enter elements of rows ",i) 
+    for j in range(c):
+        n=float(input("Enter element: ")) 
+        mtr[i].append(n)
+print("Enter the matrix: ") 
+for row in mtr:
+    print(' '.join(("{0:.2f}".format(x) for x in row))) 
+row_echelon(mtr)
+print("Row Echelon for matrix: ") 
+for row in mtr:
+    print(' '.join(("{0:.2f}".format(x) for x in row)))
+
+
+# Practical 8: Write a program to find 
+# Eigen values and vectors
+
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-
-# Importing the dataset
-dataset = pd.read_csv('Social_Network_Ads.csv')
-
-# One-Hot Encoding for the 'Gender' column
-dataset = pd.get_dummies(dataset, columns=['Gender'], drop_first=True)
-
-# Extracting features and target variable
-X = dataset.iloc[:, [2, 3, 4]].values  # Selecting relevant columns (Age, EstimatedSalary, Gender_Male)
-y = dataset.iloc[:, -1].values
-
-# Splitting the dataset into the Training set and Test set
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
-
-# Feature Scaling
-from sklearn.preprocessing import StandardScaler
-
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
-
-# Training the Naive Bayes model on the Training set
-from sklearn.naive_bayes import GaussianNB
-
-classifier = GaussianNB()
-classifier.fit(X_train, y_train)
-
-# Predicting the Test set results
-y_pred = classifier.predict(X_test)
-
-# Making the Confusion Matrix
-from sklearn.metrics import confusion_matrix, accuracy_score
-
-cm = confusion_matrix(y_test, y_pred)
-print("Confusion Matrix:")
-print(cm)
-
-acc_score = accuracy_score(y_test, y_pred)
-print("Accuracy Score:", acc_score)
-
-# Visualising the Training set results
-from matplotlib.colors import ListedColormap
-
-X_set, y_set = X_train, y_train
-X1, X2 = np.meshgrid(np.arange(start=X_set[:, 0].min() - 1, stop=X_set[:, 0].max() + 1, step=0.01),
-                     np.arange(start=X_set[:, 1].min() - 1, stop=X_set[:, 1].max() + 1, step=0.01))
-
-plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel(), np.zeros_like(X1.ravel())]).T).reshape(X1.shape),
-             alpha=0.75, cmap=ListedColormap(['red', 'green']))
-
-plt.xlim(X1.min(), X1.max())
-plt.ylim(X2.min(), X2.max())
-
-for i, j in enumerate(np.unique(y_set)):
-    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1], c=ListedColormap(['red', 'green'])(i), label=j)
-
-plt.title('Naive Bayes (Training set)')
-plt.xlabel('Age')
-plt.ylabel('Estimated Salary')
-plt.legend()
-plt.show()
+print("Enter dimensions of matrix: ") 
+r=int(input("Enter the no of rows: ")) 
+c=int(input("Enter the no of cols: ")) 
+mtr=[]
+for i in range (r): 
+    mtr.append([])
+    print("Enter elements of rows ",i) 
+    for j in range(c):
+        n=float(input("Enter element: ")) 
+        mtr[i].append(n)
+print("Entered matrix: ") 
+for row in mtr:
+    print(' '.join(("{0:.2f}".format(x) for x in row))) 
+w, v = np.linalg.eig(mtr)
+print("Eigen Values Are:",w) 
+print("Eigen Vectors Are:",v)
 
 
+# Practical 9: Write a program to implement 
+# Gaussian elimination method.
 
-###########################################################################################
-# Support Vector Machine (SVM)
-# Importing the libraries
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-
-# Importing the dataset
-dataset = pd.read_csv('/content/Social_Network_Ads.csv')
-dataset.head()
-
-X = dataset.iloc[:, [2, 3]].values
-y = dataset.iloc[:, 4].values
-
-# Splitting the dataset into the Training set and Test set
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
-
-print(X_train.shape)
-print(X_test.shape)
-print(y_train.shape)
-print(y_test.shape)
-
-# Feature Scaling
-from sklearn.preprocessing import StandardScaler
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
-
-# Fitting SVM to the Training set
-from sklearn.svm import SVC
-classifier = SVC(kernel = 'linear', random_state = 0)
-classifier.fit(X_train, y_train)
-
-# Predicting the Test set results
-y_pred = classifier.predict(X_test)
-
-# Making the Confusion Matrix
-from sklearn.metrics import confusion_matrix
-cm = confusion_matrix(y_test, y_pred)
-
-y_pred
-
-print(cm)
-
-#Accuracy score
-from sklearn.metrics import accuracy_score
-accuracy_score(y_test, y_pred)
-
-#Classification Report
-from sklearn.metrics import classification_report
-print(classification_report(y_test, y_pred))
-
-# Visualising the Training set results
-from matplotlib.colors import ListedColormap
-X_set, y_set = X_train, y_train
-X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1, stop = X_set[:, 0].max() + 1, step = 0.01),
-                     np.arange(start = X_set[:, 1].min() - 1, stop = X_set[:, 1].max() + 1, step = 0.01))
-plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
-             alpha = 0.75, cmap = ListedColormap(('red', 'green')))
-plt.xlim(X1.min(), X1.max())
-plt.ylim(X2.min(), X2.max())
-for i, j in enumerate(np.unique(y_set)):
-    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
-                c = ListedColormap(('red', 'green'))(i), label = j)
-plt.title('SVM (Training set)')
-plt.xlabel('Age')
-plt.ylabel('Estimated Salary')
-plt.legend()
-plt.show()
-
-# Visualising the Test set results
-from matplotlib.colors import ListedColormap
-X_set, y_set = X_test, y_test
-X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1, stop = X_set[:, 0].max() + 1, step = 0.01),
-                     np.arange(start = X_set[:, 1].min() - 1, stop = X_set[:, 1].max() + 1, step = 0.01))
-plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
-             alpha = 0.75, cmap = ListedColormap(('red', 'green')))
-plt.xlim(X1.min(), X1.max())
-plt.ylim(X2.min(), X2.max())
-for i, j in enumerate(np.unique(y_set)):
-    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
-                c = ListedColormap(('red', 'green'))(i), label = j)
-plt.title('SVM (Test set)')
-plt.xlabel('Age')
-plt.ylabel('Estimated Salary')
-plt.legend()
-plt.show()
+import numpy as np 
+import sys
+# Reading number of unknowns
+n = int(input('Enter number of unknowns: '))
+# Making numpy array of n x n+1 size and initializing # to zero for storing augmented matrix
+a = np.zeros((n,n+1))
+# Making numpy array of n size and initializing # to zero for storing solution vector
+x = np.zeros(n)
+# Reading augmented matrix coefficients 
+print('Enter Augmented Matrix Coefficients:') 
+for i in range(n):
+    for j in range(n+1):
+        a[i][j] = float(input( 'a['+str(i)+']['+ str(j)+']=')) 
+# Applying Gauss Elimination
+for i in range(n): 
+    if a[i][i] == 0.0:
+        sys.exit('Divide by zero detected!') 
+    for j in range(i+1, n):
+        ratio = a[j][i]/a[i][i] 
+        for k in range(n+1):
+            a[j][k] = a[j][k] - ratio * a[i][k] 
+# Back Substitution
+x[n-1] = a[n-1][n]/a[n-1][n-1] 
+for i in range(n-2,-1,-1):
+    x[i] = a[i][n]
+    for j in range(i+1,n): 
+        x[i] = x[i] - a[i][j]*x[j]
+x[i] = x[i]/a[i][i]
+# Displaying solution 
+print('\nRequired solution is: ') 
+for i in range(n):
+    print('X%d = %0.2f' %(i,x[i]), end = '\t')
 
 
+# Practical 10: Write a program to implement 
+# concepts of orthogonalization
+
+def isOrthogonal(a, m, n): 
+    if (m != n) :
+        return False
+    trans = [[0 for x in range(n)] 
+            for y in range(n)]
+    # Find transpose 
+    for i in range(0, n) :
+        for j in range(0, n): 
+            trans[i][j] = a[j][i]
+
+    prod = [[0 for x in range(n)] for y in range(n)]
+    # Find product of a[][] and its transpose 
+    for i in range(0, n) :
+        for j in range(0, n) : 
+            sum = 0
+            for k in range(0, n) : 
+                sum = sum + (a[i][k]*a[j][k]) 
+                prod[i][j] = sum
+    for i in range(0, n) :
+        for j in range(0, n) :
+            if (i != j and prod[i][j] != 0) : 
+                return False
+            if (i == j and prod[i][j] != 1) : 
+                return False
+        return True
+a = [[1, 0, 0],
+[0, 1, 0],
+[0, 0, 1]]
+
+if (isOrthogonal(a, 3, 3)) : 
+    print ("Yes")
+else :
+    print ("No")
 
 
 
