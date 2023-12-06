@@ -1,0 +1,383 @@
+
+#### Cassandra
+
+https://datastax-community-edition.software.informer.com/download/
+
+
+##### mongodb
+
+https://www.mongodb.com/try/download/community
+
+
+
+# Practical 2
+
+# Aim: To Demonstrate CREATE, ALTER and DROP operations on Cassandra keyspace
+
+# Creating Keyspace
+
+cqlsh> -- Creating a keyspace in cassandra
+cqlsh> CREATE KEYSPACE prac2_keyspace WITH replication={'class':'SimpleStrategy', 'replication_factor':3};
+cqlsh> DESCRIBE KEYSPACES;
+system_schema system
+system_distributed system_traces
+system_auth prac2_keyspace netw_keyspace
+
+
+
+# Altering Keyspace
+cqlsh> -- Altering a keyspace in cassandra
+cqlsh> ALTER KEYSPACE prac2_keyspace WITH replication={'class':'NetworkTopologyStrategy'} AND DURABLE_WRITES=FALSE;
+cqlsh> DESCRIBE KEYSPACE prac2_keyspace;
+CREATE KEYSPACE prac2_keyspace WITH replication = {'class': 'NetworkTopologyStrategy'} AND durable_writes = false;
+
+
+# Deleting Keyspace
+cqlsh> -- Deleting a keyspace in cassandra 
+cqlsh> DROP KEYSPACE prac2_keyspace; 
+cqlsh>
+
+########################################################################################
+
+# Practical 3
+
+Aim: To demonstrate CRUD operations on a Cassandra table
+
+Creating a table and inserting reacords into it
+
+cqlsh> -- Practical 3 cqlsh> -- CREATE
+cqlsh> CREATE KEYSPACE prac3_keyspace WITH replication={'class':'SimpleStrategy', 'replication_factor':3};
+cqlsh> USE prac3_keyspace; cqlsh:prac3_keyspace> CREATE TABLE student(
+... id INT PRIMARY KEY,
+... name TEXT,
+... age INT,
+... course TEXT
+... );
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (1, 'Inbasagar', 22, 'MSc DS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (2, 'Ashwini', 22, 'MSc DS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (3, 'Gautham', 22, 'MSc CS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (4, 'Sonia', 22, 'MSc DS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (5, 'Ajith', 22, 'MSc CS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (6, 'Angelica', 22, 'MSc DS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (7, 'Sanjeevani', 23, 'MSc DS Part-2');
+cqlsh:prac3_keyspace> INSERT INTO student (id, name, age, course) VALUES (8, 'Pranav', 22, 'MSc DS Part-2');
+
+
+Reading records from the table
+cqlsh:prac3_keyspace> -- READ cqlsh:prac3_keyspace> SELECT * FROM student;
+
+Updating records of the table
+cqlsh:prac3_keyspace> -- UPDATE
+cqlsh:prac3_keyspace> UPDATE student SET name = 'Aswany' WHERE id = 2; 
+cqlsh:prac3_keyspace> SELECT * FROM student;
+
+
+Delete records from table
+cqlsh:prac3_keyspace> -- DELETE
+cqlsh:prac3_keyspace> DELETE FROM student WHERE id = 8; 
+cqlsh:prac3_keyspace> SELECT * FROM student;
+
+
+########################################################################################
+# Prac 4
+
+# Aim: To create a collection in MongoDB containing restaurant information and show restaurants having American cuisine
+
+
+# Creating collection and inserting records
+
+use prac4_db
+switched to db prac4_db
+> db.restaurant.insertOne(
+... {
+... name:"Ramdev hotel",
+... region:"Sion",
+... cuisine:"Indian"
+... }
+... )
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f154b055f21e2463c66b")
+}
+> db.restaurant.insertOne(
+... {
+... name:"Hanuman",
+... region:"Sion",
+... cuisine:"Indian"
+... }
+... )
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f154b055f21e2463c66c")
+}
+> db.restaurant.insertOne(
+... {
+... name:"Social",
+... region:"Khar",
+... cuisine:"American"
+... }
+... )
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f155b055f21e2463c66d")
+}
+> db.restaurant.insertOne(
+... {
+... name:"Sushi Place",
+... region:"Powai",
+... cuisine:"Japanse"
+... }
+... )
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f155b055f21e2463c66e")
+}
+> db.restaurant.insertOne(
+... {
+... name:"Modern Hotel",
+... region:"Sion",
+... cuisine:"American"
+... }
+... )
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f158b055f21e2463c66f")
+}
+
+# Fetching records that have American cuisine
+
+> db.restaurant.find(
+... {
+... cuisine:"American"
+... }
+... )
+{ "_id" : ObjectId("61b1f155b055f21e2463c66d"), "name" : "Social", "region" : "Khar", "cuisine" : "American" }
+{ "_id" : ObjectId("61b1f158b055f21e2463c66f"), "name" : "Modern Hotel", "region" : "Sion", "cuisine" : "American" }
+
+
+########################################################################################
+
+# Practical 5
+
+# Aim: To create a collection in MongoDB containing student exam result information and show list of students who 
+# scored more than 60 marks
+
+# Creating collection and inserting records
+> use prac5_db
+switched to db prac5_db
+> db.student.insertOne({name:"Inbasagar", marks:90})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d1b055f21e2463c678")
+}
+> db.student.insertOne({name:"Dhanasekhar", marks:90})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d1b055f21e2463c679")
+}
+> db.student.insertOne({name:"Aswany", marks:85})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d1b055f21e2463c67a")
+}
+> db.student.insertOne({name:"Pranav", marks:85})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d1b055f21e2463c67b")
+}
+> db.student.insertOne({name:"Raju", marks:45})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d2b055f21e2463c67c")
+}
+> db.student.insertOne({name:"Pritam", marks:55})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d2b055f21e2463c67d")
+}
+> db.student.insertOne({name:"Munna", marks:5})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d2b055f21e2463c67e")
+}
+> db.student.insertOne({name:"Sonia", marks:87})
+{
+"acknowledged" : true,
+"insertedId" : ObjectId("61b1f4d2b055f21e2463c67f")
+}
+
+Fetching student records with marks greater than 60
+> db.student.find({marks:{$gt:60}})
+{ "_id" : ObjectId("61b1f4d1b055f21e2463c678"), "name" : "Inbasagar", "marks" : 90 }
+{ "_id" : ObjectId("61b1f4d1b055f21e2463c679"), "name" : "Dhanasekhar", "marks" : 90 }
+{ "_id" : ObjectId("61b1f4d1b055f21e2463c67a"), "name" : "Aswany", "marks" : 85 }
+{ "_id" : ObjectId("61b1f4d1b055f21e2463c67b"), "name" : "Pranav", "marks" : 85 }
+{ "_id" : ObjectId("61b1f4d2b055f21e2463c67f"), "name" : "Sonia", "marks" : 87 }
+>
+
+
+########################################################################################
+
+# Aim: To set up replication server in MongoDB
+
+# Starting primary MongoDB daemon on port 27017
+
+PS C:\Windows\system32> mongod --dbpath "C:\Program Files\MongoDB\Server\4.0\data" --logpath "C:\Program Files\MongoDB\Server\4.0\log\mongod.log" --port 27017 --storageEngine=wiredTiger -
+-journal --replSet sies
+2021-12-09T18:05:31.715+0530 I CONTROL [main] log file "C:\Program Files\MongoDB\Server\4.0\log\mongod.log" exists; moved to "C:\Program Files\MongoDB\Server\4.0\log\mongod.log.2021-12-09T12-35-31".
+
+
+Starting secondary MongoDB daemon on port 27020
+PS C:\Windows\system32> mongod --dbpath "C:\data1\db" --logpath "C:\data1\log\mongod.log" -- port 27020 --storageEngine=wiredTiger --journal --replSet sies
+2021-12-09T18:08:43.088+0530 I CONTROL [main] log file "C:\data1\log\mongod.log" exists; moved to "C:\data1\log\mongod.log.2021-12-09T12-38-43".
+
+
+Connecting to primary daemon & adding secondary (port 27020) daemon for replication
+PS C:\Windows\system32> mongo --port 27017 sies:PRIMARY> rs.add("localhost:27020")
+{
+"ok" : 1,
+"operationTime" : Timestamp(1639056640, 1), "$clusterTime" : {
+"clusterTime" : Timestamp(1639056640, 1), "signature" : {
+"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+"keyId" : NumberLong(0)
+}
+}
+}
+
+
+Connecting to secondary daemon accepting replication data from primary
+PS C:\Windows\system32> mongo --port 27020 
+sies:OTHER> rs.secondaryOk()
+
+On primary client, creating database and inserting data into a new collection
+sies:PRIMARY> use prac6_db switched to db prac6_db
+sies:PRIMARY> db.cities.insert(name:"Mumbai", district:"Maharashtra")
+2021-12-09T19:01:32.876+0530 E QUERY [js] SyntaxError: missing ) after argument list @(shell):1:21
+sies:PRIMARY> db.cities.insert({name:"Mumbai", district:"Maharashtra"}) WriteResult({ "nInserted" : 1 })
+sies:PRIMARY> db.cities.insert({name:"Chennai", district:"Tamil Nadu"}) WriteResult({ "nInserted" : 1 })
+sies:PRIMARY> db.cities.insert({name:"Trivandrum", district:"Kerala"}) WriteResult({ "nInserted" : 1 })
+sies:PRIMARY>
+
+On secondary client, displaying replica of data created originally on primary client.
+sies:SECONDARY> use prac6_db switched to db prac6_db sies:SECONDARY> db.cities.find()
+{ "_id" : ObjectId("61b2053d60025a363da7dc93"), "name" : "Mumbai", "district" : "Maharashtra"
+}
+{ "_id" : ObjectId("61b2054d60025a363da7dc94"), "name" : "Chennai", "district" : "Tamil Nadu"
+}
+{ "_id" : ObjectId("61b2056d60025a363da7dc95"), "name" : "Trivandrum", "district" : "Kerala" } 
+
+sies:SECONDARY>
+
+
+###################################################################################
+
+
+#### Practical 6 #####
+
+
+mkdir  c:\data1\config  c:\data1\db  c:\data1\log
+
+service stop
+
+# first cmd prompt with admin privliages
+
+
+mongod --dbpath "C:\Program Files\MongoDB\Server\4.4\data" --logpath "C:\Program Files\MongoDB\Server\4.4\log\mongod.log" --port 27017 --storageEngine=wiredTiger --journal --replSet sies
+
+# second cmd prompt with admin privliages
+
+ mongo --port 27017
+
+rsconf={_id:"sies", members:[{_id:0,host:"localhost:27017"}]}
+
+rs.initiate(rsconf)
+
+#####  press "enter" 2 times  #####
+
+show dbs;
+
+
+# # third cmd prompt with admin privliages 
+mongod --dbpath "c:\data1\db" --logpath "c:\data1\log\mongod.log" --port 27020 --storageEngine=wiredTiger --journal --replSet sies
+
+# fourth cmd prompt with admin privliages
+
+ mongo --port 27020
+
+
+# put this in second comand prompt after initiating fourth command prompt
+
+rs.add("localhost:27020")
+rs.status();
+
+
+
+#### go to second cmd peompt (primary) ####
+
+sies:PRIMARY> use repdb1
+switched to db repdb1
+sies:PRIMARY> db.student.insert ({ "name" : "Avi" });
+WriteResult({ "nInserted" : 1 })
+sies:PRIMARY> db.student.find()
+{ "_id" : ObjectId("657099120e7ff6cd4fd1802f"), "name" : "Avi" }
+sies:PRIMARY>
+
+#### go to fourth cmd peompt (slave) ####
+
+sies:SECONDARY> show dbs;
+sies:SECONDARY> rs.secondaryOk();
+sies:SECONDARY> show dbs;
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+sies:SECONDARY> db.student.find()
+sies:SECONDARY> use repdb1
+switched to db repdb1
+sies:SECONDARY> db.student.find()
+{ "_id" : ObjectId("657099120e7ff6cd4fd1802f"), "name" : "Avi" }
+
+
+###########################################################################################
+
+
+# Practical 7
+
+Aim: To connect to remote virtual desktop using PuTTY.
+
+
+VM Configurations:
+ Hosted on: Azure Cloud
+ Server Name: Cloud-Practicals-XXXX
+ VM: Ubuntu 20.04.3
+ IP Address: 20.XXX.XXX.XXX
+ Username: siXXXXXXX
+ Password: MscdataXXXXXXXX
+
+Accessing via PuTTY Terminal:
+
+login as: siXXXXXXX siXXXXXXX@20.XXX.XXX.XXX's password:
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.11.0-1022-azure x86_64)
+* Documentation: https://help.ubuntu.com
+* Management: https://landscape.canonical.com
+* Support: https://ubuntu.com/advantage
+System information as of Fri Dec 10 17:31:00 UTC 2021
+System load: 0.01
+Usage of /: 7.6% of 28.90GB Memory usage: 9%
+Processes: Users logged in:
+138
+0
+IPv4 address for eth0: 10.0.0.4
+Swap usage: 0%
+* Super-optimized for small spaces - read how we shrank the memory footprint of MicroK8s to make it the smallest full K8s around.
+https://ubuntu.com/blog/microk8s-memory-optimisation
+6 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+Last login: Fri Dec 10 17:25:27 2021 from 43.XXX.XXX.XXX siesadmin@sies-pracs:~$ mkdir prac8_dir
+siesadmin@sies-pracs:~$ cd prac8_dir siesadmin@sies-pracs:~/prac8_dir$ cat>names.txt Inbasagar Nadar
+siesadmin@sies-pracs:~/prac8_dir$ cat names.txt Inbasagar Nadar
+siesadmin@sies-pracs:~/prac8_dir$
+
+
+
+
+
